@@ -8,12 +8,6 @@ import re
 import threading
 
 x = 0
-"""
-https://telegra.ph/Prezident-studsoveta-golaya--Class-President-Undressed-04-18
-https://telegra.ph/Twin-Mother-Incest-Ch-1-04-19
-https://telegra.ph/Malenkaya-lyubov--Mei-ni-Gachi-Koi-03-06
-"""
-
 
 def getAllImagesFromURL(url):
     if not os.path.exists(os.getcwd() + '\\temp'):
