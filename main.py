@@ -6,13 +6,9 @@ from PIL import Image
 from PIL import ImageTk
 import re
 import threading
+from plyer import notification
 
 x = 0
-"""
-https://telegra.ph/Prezident-studsoveta-golaya--Class-President-Undressed-04-18
-https://telegra.ph/Twin-Mother-Incest-Ch-1-04-19
-https://telegra.ph/Malenkaya-lyubov--Mei-ni-Gachi-Koi-03-06
-"""
 
 
 def getAllImagesFromURL(url):
@@ -30,6 +26,12 @@ def getAllImagesFromURL(url):
     except requests.exceptions.MissingSchema as e:
         print(e)
         return 1
+    notification.notify(
+        title='Telegra.ph Gallery Viewer',
+        message='Telegra.ph URL detected. Downloading gallery.',
+        app_icon=None,  # e.g. 'C:\\icon_32x32.ico'
+        timeout=3,  # seconds
+    )
     articles = re.findall('<article.*</article>', html.text)
     print(articles)
     srcs = re.findall('src=.*?>', articles[0])
@@ -47,13 +49,24 @@ def getAllImagesFromURL(url):
 def getImage(src, srcssrc):
     file = open(os.getcwd() + '\\temp\\' + str('{:02d}').format(src+1) +
                 str(re.search('[.].*?$', srcssrc[-6:], ).group()), 'wb')
-    file.write(requests.get(srcssrc).content)
+    try:
+        file.write(requests.get(srcssrc).content)
+    except requests.exceptions.SSLError as e:
+        print(e)
+        file.close()
+        os.remove(file.name)
     file.close()
 
 
 def playSlideshow():
     if len(os.listdir(os.getcwd()+'\\temp')) == 0:
         print('There is nothing to see now.')
+        notification.notify(
+            title='Telegra.ph Gallery Viewer',
+            message='There is nothing to see now.',
+            app_icon=None,  # e.g. 'C:\\icon_32x32.ico'
+            timeout=3,  # seconds
+        )
         return 0
     root = Tk()
     root.attributes('-fullscreen', True)
@@ -75,7 +88,7 @@ def playSlideshow():
 
     print(len(imgs))
 
-    def move(event):
+    def moveforward(event):
         global x
         x = x+1
         print(x)
@@ -104,7 +117,7 @@ def playSlideshow():
         return 0
 
     root.bind("<Escape>", close)
-    root.bind("<Right>", move)
+    root.bind("<Right>", moveforward)
     root.bind("<Left>", moveback)
 
     root.mainloop()
