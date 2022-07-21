@@ -26,6 +26,8 @@ def getAllImagesFromURL(url):
     except requests.exceptions.MissingSchema as e:
         print(e)
         return 1
+    finally:
+        pyperclip.copy('')
     notification.notify(
         title='Telegra.ph Gallery Viewer',
         message='Telegra.ph URL detected. Downloading gallery.',
