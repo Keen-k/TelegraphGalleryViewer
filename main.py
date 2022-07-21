@@ -123,12 +123,22 @@ def playSlideshow():
     root.mainloop()
 
 
-if __name__ == '__main__':
+def main():
+    global page_number
+    page_number = 0
+    pyperclip.copy('')
+    temp_dir = os.path.join(os.path.dirname(__file__), 'temp')
+    if not os.path.exists(temp_dir):
+        os.mkdir(temp_dir)
     while True:
         url = pyperclip.waitForNewPaste()
         print('Wait for telegra.ph URL in clipboard.')
         if 'telegra' in url:
-            getAllImagesFromURL(url)
-            playSlideshow()
+            get_all_images_from_url(url, temp_dir)
+            play_slideshow(temp_dir)
         else:
             print('Clipboard content changed, but no URL in there.')
+
+
+if __name__ == '__main__':
+    main()
