@@ -52,8 +52,8 @@ def getImage(src, srcssrc):
     file = open(os.getcwd() + '\\temp\\' + str('{:02d}').format(src+1) +
                 str(re.search('[.].*?$', srcssrc[-6:], ).group()), 'wb')
     try:
-        file.write(requests.get(srcssrc).content)
-    except requests.exceptions.SSLError as e:
+        file.write(requests.get(src_string, timeout=3).content)
+    except Exception as e:
         print(e)
         file.close()
         os.remove(file.name)
