@@ -80,7 +80,7 @@ def playSlideshow():
     # for image in range(len(images)):
     #     imgs.append(ImageTk.PhotoImage(Image.open("temp\\{}".format(images[image]))))
     for image in range(len(images)):
-        im = Image.open("temp\\{}".format(images[image]))
+        im = Image.open(os.path.join(slides_dir, images[image]))
         w, h = im.size
         percent = root.winfo_screenheight() / h
         imgs.append(ImageTk.PhotoImage(im.resize((int(w * percent), int(h * percent)))))
