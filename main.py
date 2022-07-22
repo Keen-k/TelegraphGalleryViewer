@@ -10,16 +10,13 @@ from plyer import notification
 
 x = 0
 
-
-def getAllImagesFromURL(url):
-    if not os.path.exists(os.getcwd() + '\\temp'):
-        os.mkdir('temp')
-    if len(os.listdir(os.getcwd()+'\\temp')) > 0:
-        for file in os.listdir(os.getcwd()+'\\temp'):
-            os.remove(os.getcwd() + '\\temp\\' + file)
-    print(url)
+def get_all_images_from_url(telegraphurl, temp_dir):
+    if len(temp_dir_list := os.listdir(temp_dir)) > 0:
+        for file in temp_dir_list:
+            os.remove(os.path.join(temp_dir, file))
+    print(telegraphurl)
     try:
-        html = requests.get(url)
+        html = requests.get(telegraphurl)
     except requests.exceptions.InvalidSchema as e:
         print(e)
         return 1
