@@ -8,7 +8,6 @@ import re
 import threading
 from plyer import notification
 
-x = 0
 
 def get_all_images_from_url(telegraphurl, temp_dir):
     if len(temp_dir_list := os.listdir(temp_dir)) > 0:
@@ -83,37 +82,37 @@ def play_slideshow(slides_dir):
         percent = root.winfo_screenheight() / h
         imgs.append(ImageTk.PhotoImage(im.resize((int(w * percent), int(h * percent)))))
 
-    l = Label(root, image=imgs[0])
-    l.pack()
+    label = Label(root, image=imgs[0])
+    label.pack()
 
     print(len(imgs))
 
     def moveforward(event):
-        global x
-        x = x+1
-        print(x)
-        if x == len(imgs):
+        global page_number
+        page_number = page_number + 1
+        print(page_number)
+        if page_number == len(imgs):
             root.destroy()
-            x = 0
+            page_number = 0
             return 0
-        root.title('{:02d}/{:02d}'.format(x+1, len(imgs)))
-        l.config(image=imgs[x])
+        root.title('{:02d}/{:02d}'.format(page_number + 1, len(imgs)))
+        label.config(image=imgs[page_number])
 
     def moveback(event):
-        global x
-        x = x-1
-        print(x)
-        if x < 0:
+        global page_number
+        page_number = page_number - 1
+        print(page_number)
+        if page_number < 0:
             root.destroy()
-            x = 0
+            page_number = 0
             return 0
-        root.title('{:02d}/{:02d}'.format(x+1, len(imgs)))
-        l.config(image=imgs[x])
+        root.title('{:02d}/{:02d}'.format(page_number + 1, len(imgs)))
+        label.config(image=imgs[page_number])
 
     def close(event):
         root.destroy()
-        global x
-        x = 0
+        global page_number
+        page_number = 0
         return 0
 
     root.bind("<Escape>", close)
