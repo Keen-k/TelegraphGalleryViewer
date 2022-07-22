@@ -70,7 +70,8 @@ def play_slideshow(slides_dir):
     root = Tk()
     root.attributes('-fullscreen', True)
     root.configure(bg='black')
-    images = os.listdir(os.getcwd()+'\\temp')
+    images = os.listdir(slides_dir)
+    images.sort()
     print(images)
 
     imgs = []
