@@ -41,13 +41,14 @@ def get_all_images_from_url(telegraphurl, temp_dir):
             srcs[string] = "https://telegra.ph" + srcs[string]
     print(srcs)
     for src in range(len(srcs)):
-        thread = threading.Thread(target=getImage(src, srcs[src]))
+        thread = threading.Thread(target=get_image(src, srcs[src], temp_dir))
         thread.start()
 
 
-def getImage(src, srcssrc):
-    file = open(os.getcwd() + '\\temp\\' + str('{:02d}').format(src+1) +
-                str(re.search('[.].*?$', srcssrc[-6:], ).group()), 'wb')
+def get_image(src_index, src_string, gallery_dir):
+    file = open(os.path.join(gallery_dir,
+                             str('{:05d}').format(src_index + 1) +
+                             str(re.search('[.].*?$', src_string[-6:], ).group())), 'wb')
     try:
         file.write(requests.get(src_string, timeout=3).content)
     except Exception as e:
@@ -57,8 +58,8 @@ def getImage(src, srcssrc):
     file.close()
 
 
-def playSlideshow():
-    if len(os.listdir(os.getcwd()+'\\temp')) == 0:
+def play_slideshow(slides_dir):
+    if len(os.listdir(slides_dir)) == 0:
         print('There is nothing to see now.')
         notification.notify(
             title='Telegra.ph Gallery Viewer',
