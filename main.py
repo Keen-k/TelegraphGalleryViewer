@@ -38,6 +38,11 @@ def get_all_images_from_url(telegraphurl, temp_dir):
         srcs[string] = srcs[string][5:-2]
         if srcs[string][0] == '/':
             srcs[string] = "https://telegra.ph" + srcs[string]
+
+        # TODO Write module with rules.
+
+        if 'pornmult.club' in srcs[string]:
+            srcs[string] = srcs[string].replace('club', 'press')
     print(srcs)
     for src in range(len(srcs)):
         thread = threading.Thread(target=get_image(src, srcs[src], temp_dir))
@@ -73,6 +78,7 @@ def play_slideshow(slides_dir):
     images = os.listdir(slides_dir)
     images.sort()
     print(images)
+    page_number = 0
 
     imgs = []
     # for image in range(len(images)):
@@ -89,8 +95,8 @@ def play_slideshow(slides_dir):
     print(len(imgs))
 
     def moveforward(event):
-        global page_number
-        page_number = page_number + 1
+        nonlocal page_number
+        page_number += 1
         print(page_number)
         if page_number == len(imgs):
             root.destroy()
@@ -100,8 +106,8 @@ def play_slideshow(slides_dir):
         label.config(image=imgs[page_number])
 
     def moveback(event):
-        global page_number
-        page_number = page_number - 1
+        nonlocal page_number
+        page_number -= 1
         print(page_number)
         if page_number < 0:
             root.destroy()
@@ -112,8 +118,6 @@ def play_slideshow(slides_dir):
 
     def close(event):
         root.destroy()
-        global page_number
-        page_number = 0
         return 0
 
     root.bind("<Escape>", close)
@@ -124,8 +128,6 @@ def play_slideshow(slides_dir):
 
 
 def main():
-    global page_number
-    page_number = 0
     pyperclip.copy('')
     temp_dir = os.path.join(os.path.dirname(__file__), 'temp')
     if not os.path.exists(temp_dir):
