@@ -88,6 +88,7 @@ def play_slideshow(slides_dir):
         percent = root.winfo_screenheight() / h
         imgs.append(ImageTk.PhotoImage(im.resize((int(w * percent), int(h * percent)))))
 
+    root.title('{:02d}/{:02d}'.format(1, len(imgs)))
     label = Label(root, image=imgs[0])
     label.pack()
 
