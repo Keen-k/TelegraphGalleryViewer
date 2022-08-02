@@ -11,7 +11,8 @@ from PIL import ImageTk
 from plyer import notification
 
 
-async def get_all_images_from_url(telegraph_url: str, temp_dir: str) -> int or None:
+# TODO Refactor get_all_images_from_url() it seems too long and conplex
+async def get_all_images_from_url(telegraph_url: str, temp_dir: str) -> None:
     if len(temp_dir_list := os.listdir(temp_dir)) > 0:
         for file in temp_dir_list:
             os.remove(os.path.join(temp_dir, file))
@@ -20,10 +21,10 @@ async def get_all_images_from_url(telegraph_url: str, temp_dir: str) -> int or N
         html = requests.get(telegraph_url)
     except requests.exceptions.InvalidSchema as e:
         print(e)
-        return 1
+        return None
     except requests.exceptions.MissingSchema as e:
         print(e)
-        return 1
+        return None
     finally:
         pyperclip.copy('')
     notification.notify(
@@ -48,12 +49,18 @@ async def get_all_images_from_url(telegraph_url: str, temp_dir: str) -> int or N
     print(srcs)
     async with aiohttp.ClientSession() as session:
         await asyncio.gather(
-            *[get_image(source_index, source_url, temp_dir, session) for source_index, source_url in enumerate(srcs)]
+            *[get_image(source_index, source_url, temp_dir, session) for
+              source_index, source_url in enumerate(srcs)]
         )
     return None
 
 
-async def get_image(src_index: int, src_string: str, gallery_dir: str, session: aiohttp.ClientSession) -> None:
+async def get_image(
+        src_index: int,
+        src_string: str,
+        gallery_dir: str,
+        session: aiohttp.ClientSession,
+        ) -> None:
     print(src_index, end=' ')
     file = open(os.path.join(gallery_dir,
                              str('{:05d}').format(src_index + 1) +
@@ -98,9 +105,13 @@ def play_slideshow(slides_dir: str) -> None:
         image = Image.open(os.path.join(directory, image))
         image_width, image_height = image.size
         print(root.winfo_height())
-        resize_coefficient = root.winfo_screenheight() / image_height  # insignificant error in size may occur
+        # insignificant error in size may occur
+        resize_coefficient = root.winfo_screenheight() / image_height
         image_resized = image.resize(
-            (int(image_width * resize_coefficient), int(image_height * resize_coefficient)))
+            (int(image_width * resize_coefficient),
+             int(image_height * resize_coefficient),
+             )
+        )
         tk_image = ImageTk.PhotoImage(image_resized)
         return tk_image
 
