@@ -1,11 +1,13 @@
-import pyperclip
-import requests
+import asyncio
 import os
 from tkinter import *
+import re
+
+import aiohttp
+import pyperclip
+import requests
 from PIL import Image
 from PIL import ImageTk
-import re
-import threading
 from plyer import notification
 
 
