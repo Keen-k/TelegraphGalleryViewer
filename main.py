@@ -9,13 +9,13 @@ import threading
 from plyer import notification
 
 
-def get_all_images_from_url(telegraphurl, temp_dir):
+def get_all_images_from_url(telegraph_url, temp_dir):
     if len(temp_dir_list := os.listdir(temp_dir)) > 0:
         for file in temp_dir_list:
             os.remove(os.path.join(temp_dir, file))
-    print(telegraphurl)
+    print(telegraph_url)
     try:
-        html = requests.get(telegraphurl)
+        html = requests.get(telegraph_url)
     except requests.exceptions.InvalidSchema as e:
         print(e)
         return 1
