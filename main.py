@@ -47,7 +47,7 @@ async def get_all_images_from_url(telegraph_url: str, temp_dir: str) -> int or N
             srcs[string_index] = srcs[string_index].replace('club', 'press')
     print(srcs)
     async with aiohttp.ClientSession() as session:
-        result = await asyncio.gather(
+        await asyncio.gather(
             *[get_image(source_index, source_url, temp_dir, session) for source_index, source_url in enumerate(srcs)]
         )
     return None
@@ -89,6 +89,7 @@ def play_slideshow(slides_dir: str) -> None:
     root = Tk()
     root.attributes('-fullscreen', True)
     root.configure(bg='black')
+
     images.sort()
     print(images)
     root.page_number = 0
