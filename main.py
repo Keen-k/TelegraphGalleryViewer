@@ -34,15 +34,15 @@ def get_all_images_from_url(telegraphurl, temp_dir):
     print(articles)
     srcs = re.findall('src=.*?>', articles[0])
     print(srcs)
-    for string in range(len(srcs)):
-        srcs[string] = srcs[string][5:-2]
-        if srcs[string][0] == '/':
-            srcs[string] = "https://telegra.ph" + srcs[string]
+    for string_index in range(len(srcs)):
+        srcs[string_index] = srcs[string_index][5:-2]
+        if srcs[string_index][0] == '/':
+            srcs[string_index] = "https://telegra.ph" + srcs[string_index]
 
         # TODO Write module with rules.
 
-        if 'pornmult.club' in srcs[string]:
-            srcs[string] = srcs[string].replace('club', 'press')
+        if 'mult.club' in srcs[string_index]:
+            srcs[string_index] = srcs[string_index].replace('club', 'press')
     print(srcs)
     for src in range(len(srcs)):
         thread = threading.Thread(target=get_image(src, srcs[src], temp_dir))
@@ -79,50 +79,47 @@ def play_slideshow(slides_dir):
     print(images)
     page_number = 0
 
-    imgs = []
-    # for image in range(len(images)):
-    #     imgs.append(ImageTk.PhotoImage(Image.open("temp\\{}".format(images[image]))))
-    for image in range(len(images)):
-        im = Image.open(os.path.join(slides_dir, images[image]))
-        w, h = im.size
-        percent = root.winfo_screenheight() / h
-        imgs.append(ImageTk.PhotoImage(im.resize((int(w * percent), int(h * percent)))))
+    resized_images = []
 
-    root.title('{:02d}/{:02d}'.format(1, len(imgs)))
-    label = Label(root, image=imgs[0])
+    for image_index in range(len(images)):
+        image = Image.open(os.path.join(slides_dir, images[image_index]))
+        image_width, image_height = image.size
+        percent = root.winfo_screenheight() / image_height
+        resized_images.append(ImageTk.PhotoImage(image.resize((int(image_width * percent), int(image_height * percent)))))
+
+    root.title('{:02d}/{:02d}'.format(1, len(resized_images)))
+    label = Label(root, image=resized_images[0])
     label.pack()
 
-    print(len(imgs))
+    print(len(resized_images))
 
-    def moveforward(event):
+    def close_viewer(event):
+        root.destroy()
+
+    def show_next_page(event):
         nonlocal page_number
         page_number += 1
         print(page_number)
-        if page_number == len(imgs):
-            root.destroy()
-            page_number = 0
-            return 0
-        root.title('{:02d}/{:02d}'.format(page_number + 1, len(imgs)))
-        label.config(image=imgs[page_number])
+        if page_number == len(resized_images):
+            close_viewer(None)
+            return
+        root.title('{:02d}/{:02d}'.format(page_number + 1, len(resized_images)))
+        label.config(image=resized_images[page_number])
 
-    def moveback(event):
+    def show_previous_page(event):
         nonlocal page_number
         page_number -= 1
         print(page_number)
         if page_number < 0:
-            root.destroy()
-            page_number = 0
-            return 0
-        root.title('{:02d}/{:02d}'.format(page_number + 1, len(imgs)))
-        label.config(image=imgs[page_number])
+            close_viewer(None)
+            return
+        root.title('{:02d}/{:02d}'.format(page_number + 1, len(resized_images)))
+        label.config(image=resized_images[page_number])
 
-    def close(event):
-        root.destroy()
-        return 0
-
-    root.bind("<Escape>", close)
-    root.bind("<Right>", moveforward)
-    root.bind("<Left>", moveback)
+    root.bind("<Escape>", close_viewer)
+    root.bind("<KeyPress-q>", close_viewer)
+    root.bind("<Right>", show_next_page)
+    root.bind("<Left>", show_previous_page)
 
     root.mainloop()
 
