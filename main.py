@@ -36,7 +36,7 @@ def get_all_images_from_url(telegraph_url, temp_dir):
     print(srcs)
     for string_index in range(len(srcs)):
         srcs[string_index] = srcs[string_index][5:-2]
-        if srcs[string_index][0] == '/':
+        if srcs[string_index].startswith('/'):
             srcs[string_index] = "https://telegra.ph" + srcs[string_index]
 
         # TODO Write module with rules.
@@ -44,8 +44,8 @@ def get_all_images_from_url(telegraph_url, temp_dir):
         if 'mult.club' in srcs[string_index]:
             srcs[string_index] = srcs[string_index].replace('club', 'press')
     print(srcs)
-    for src in range(len(srcs)):
-        thread = threading.Thread(target=get_image(src, srcs[src], temp_dir))
+    for source_index, source_url in enumerate(srcs):
+        thread = threading.Thread(target=get_image(source_index, source_url, temp_dir))
         thread.start()
 
 
