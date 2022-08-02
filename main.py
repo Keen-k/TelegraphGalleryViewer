@@ -11,7 +11,7 @@ from PIL import ImageTk
 from plyer import notification
 
 
-def get_all_images_from_url(telegraph_url, temp_dir):
+async def get_all_images_from_url(telegraph_url: str, temp_dir: str) -> int or None:
     if len(temp_dir_list := os.listdir(temp_dir)) > 0:
         for file in temp_dir_list:
             os.remove(os.path.join(temp_dir, file))
@@ -46,17 +46,25 @@ def get_all_images_from_url(telegraph_url, temp_dir):
         if 'mult.club' in srcs[string_index]:
             srcs[string_index] = srcs[string_index].replace('club', 'press')
     print(srcs)
-    for source_index, source_url in enumerate(srcs):
-        thread = threading.Thread(target=get_image(source_index, source_url, temp_dir))
-        thread.start()
+    async with aiohttp.ClientSession() as session:
+        result = await asyncio.gather(
+            *[get_image(source_index, source_url, temp_dir, session) for source_index, source_url in enumerate(srcs)]
+        )
+    return None
 
 
-def get_image(src_index, src_string, gallery_dir):
+async def get_image(src_index: int, src_string: str, gallery_dir: str, session: aiohttp.ClientSession) -> None:
+    print(src_index, end=' ')
     file = open(os.path.join(gallery_dir,
                              str('{:05d}').format(src_index + 1) +
-                             str(re.search('[.].*?$', src_string[-6:], ).group())), 'wb')
+                             str(re.search('[.].*?$', src_string[-6:]).group())
+                             ),
+                'wb',
+                )
     try:
-        file.write(requests.get(src_string, timeout=3).content)
+        async with session.get(src_string) as image_source:
+            content = await image_source.content.read()
+            file.write(content)
     except Exception as e:
         print(e)
         file.close()
@@ -129,7 +137,7 @@ def play_slideshow(slides_dir):
     root.mainloop()
 
 
-def main():
+async def main():
     pyperclip.copy('')
     temp_dir = os.path.join(os.path.dirname(__file__), 'temp')
     if not os.path.exists(temp_dir):
@@ -138,11 +146,11 @@ def main():
         url = pyperclip.waitForNewPaste()
         print('Wait for telegra.ph URL in clipboard.')
         if 'telegra' in url:
-            get_all_images_from_url(url, temp_dir)
+            await get_all_images_from_url(url, temp_dir)
             play_slideshow(temp_dir)
         else:
             print('Clipboard content changed, but no URL in there.')
 
 
 if __name__ == '__main__':
-    main()
+    asyncio.run(main())
