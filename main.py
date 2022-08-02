@@ -75,7 +75,7 @@ async def get_image(src_index: int, src_string: str, gallery_dir: str, session: 
     return None
 
 
-def play_slideshow(slides_dir):
+def play_slideshow(slides_dir: str) -> None:
     if len(images := os.listdir(slides_dir)) == 0:
         print('There is nothing to see now.')
         notification.notify(
@@ -84,50 +84,57 @@ def play_slideshow(slides_dir):
             app_icon=None,  # e.g. 'C:\\icon_32x32.ico'
             timeout=3,  # seconds
         )
-        return 0
+        return None
+
     root = Tk()
     root.attributes('-fullscreen', True)
     root.configure(bg='black')
     images.sort()
     print(images)
-    page_number = 0
+    root.page_number = 0
 
-    resized_images = []
-
-    for image_index in range(len(images)):
-        image = Image.open(os.path.join(slides_dir, images[image_index]))
+    def resize_image(directory: str, image: str) -> ImageTk.PhotoImage:
+        image = Image.open(os.path.join(directory, image))
         image_width, image_height = image.size
-        percent = root.winfo_screenheight() / image_height
-        resized_images.append(ImageTk.PhotoImage(image.resize((int(image_width * percent), int(image_height * percent)))))
+        print(root.winfo_height())
+        resize_coefficient = root.winfo_screenheight() / image_height  # insignificant error in size may occur
+        image_resized = image.resize(
+            (int(image_width * resize_coefficient), int(image_height * resize_coefficient)))
+        tk_image = ImageTk.PhotoImage(image_resized)
+        return tk_image
 
-    root.title('{:02d}/{:02d}'.format(1, len(resized_images)))
-    label = Label(root, image=resized_images[0])
+    root.title('{:02d}/{:02d}'.format(1, len(images)))
+    root.resized_image = resize_image(slides_dir, images[root.page_number])
+    label = Label(root, image=root.resized_image)
     label.pack()
 
-    print(len(resized_images))
+    print(len(images))
 
-    def close_viewer(event):
+    def close_viewer(event) -> None:
         root.destroy()
+        return None
 
-    def show_next_page(event):
-        nonlocal page_number
-        page_number += 1
-        print(page_number)
-        if page_number == len(resized_images):
+    def show_next_page(event) -> None:
+        root.page_number += 1
+        print(root.page_number)
+        if root.page_number == len(images):
             close_viewer(None)
-            return
-        root.title('{:02d}/{:02d}'.format(page_number + 1, len(resized_images)))
-        label.config(image=resized_images[page_number])
+            return None
+        root.title('{:02d}/{:02d}'.format(root.page_number + 1, len(images)))
+        root.resized_image = resize_image(slides_dir, images[root.page_number])
+        label.config(image=root.resized_image)
+        return None
 
-    def show_previous_page(event):
-        nonlocal page_number
-        page_number -= 1
-        print(page_number)
-        if page_number < 0:
+    def show_previous_page(event) -> None:
+        root.page_number -= 1
+        print(root.page_number)
+        if root.page_number < 0:
             close_viewer(None)
-            return
-        root.title('{:02d}/{:02d}'.format(page_number + 1, len(resized_images)))
-        label.config(image=resized_images[page_number])
+            return None
+        root.title('{:02d}/{:02d}'.format(root.page_number + 1, len(images)))
+        root.resized_image = resize_image(slides_dir, images[root.page_number])
+        label.config(image=root.resized_image)
+        return None
 
     root.bind("<Escape>", close_viewer)
     root.bind("<KeyPress-q>", close_viewer)
@@ -135,6 +142,7 @@ def play_slideshow(slides_dir):
     root.bind("<Left>", show_previous_page)
 
     root.mainloop()
+    return None
 
 
 async def main():
