@@ -61,7 +61,10 @@ def get_image(src_index, src_string, gallery_dir):
         print(e)
         file.close()
         os.remove(file.name)
+        return None
     file.close()
+    print(src_index, end=' ')
+    return None
 
 
 def play_slideshow(slides_dir):
