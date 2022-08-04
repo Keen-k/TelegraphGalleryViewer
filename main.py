@@ -11,6 +11,7 @@ from PIL import ImageTk
 from plyer import notification
 
 
+# TODO Make modules, text near too long for one module.
 # TODO Refactor get_all_images_from_url() it seems too long and conplex
 async def get_all_images_from_url(telegraph_url: str, temp_dir: str) -> None:
     if len(temp_dir_list := os.listdir(temp_dir)) > 0:
@@ -104,7 +105,6 @@ def play_slideshow(slides_dir: str) -> None:
     def resize_image(directory: str, image: str) -> ImageTk.PhotoImage:
         image = Image.open(os.path.join(directory, image))
         image_width, image_height = image.size
-        print(root.winfo_height())
         # insignificant error in size may occur
         resize_coefficient = root.winfo_screenheight() / image_height
         image_resized = image.resize(
@@ -112,8 +112,8 @@ def play_slideshow(slides_dir: str) -> None:
              int(image_height * resize_coefficient),
              )
         )
-        tk_image = ImageTk.PhotoImage(image_resized)
-        return tk_image
+        image.close()
+        return ImageTk.PhotoImage(image_resized)
 
     root.title('{:02d}/{:02d}'.format(1, len(images)))
     root.resized_image = resize_image(slides_dir, images[root.page_number])
